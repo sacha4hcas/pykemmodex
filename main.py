@@ -8,7 +8,7 @@ import json
 data = json.loads(data)
 sprites = json.loads(sprites)
 
-from table_nicegui import *
+from table_aggrid import *
 from page_layout import *
 from pokemon import *
 

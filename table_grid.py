@@ -13,7 +13,7 @@ class GridTable:
     
     def addRow(self, row):
         for column, value in row.items():
-
+            pass
 
     def initFromTable(self, table):
-        self.columns = 
+        self.columns = 0

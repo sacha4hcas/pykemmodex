@@ -114,8 +114,6 @@ class Table_NGUI(Table):
             if column_name == 'image_url':
                 row['lockPosition'] = 'left'
 
-            if column_name == 'capture_rate':
-                row['rowGroup'] = True
             self.ui_columns.append(row)
         
     
