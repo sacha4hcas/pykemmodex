@@ -2,9 +2,8 @@ import os
 from nicegui import ui
 from table import *
 
-class Table_NGUI(Table):
-    def __init__(self, row_key="name", items=[]):
-        super().__init__(items)
+class AggridTable:
+    def __init__(self, row_key="name", table=None):
         self.ui_columns = []
         self.ui_rows = []
         self.row_key = row_key
@@ -15,6 +14,8 @@ class Table_NGUI(Table):
         self.display_column_menu = True
 
         self.img_size = (150,150)
+
+        self.table = table
     
     def __enter__(self):
         self.build_ui()
@@ -60,13 +61,12 @@ class Table_NGUI(Table):
         if (not self.column_menu_container):
             self.column_menu_container = ui.row().classes('w-full h-full')
         with self.column_menu_container, ui.grid(columns=10):
-                for column_name, data in self.column_data.items():
-                    ui.switch(data.label, value=data.selected, on_change=lambda e,
-                        column=data: self.toggle_column(column, e.value)).classes('border p-2')
+                for column in self.table.column_list:
+                    ui.switch(column.label, value=column.selected, on_change=lambda e,
+                        column=column: self.toggle_column(column, e.value)).classes('border p-2')
 
     def toggle_column_menu(self):
         self.display_column_menu = not self.display_column_menu
-        print(f'display column menu : {self.display_column_menu}')
         if (self.display_column_menu):
             self.build_column_menu()
         elif self.column_menu_container:
@@ -78,40 +78,40 @@ class Table_NGUI(Table):
     
     def refresh_table(self):
         os.system('cls' if os.name == 'nt' else 'clear')
-        print(f'{self}')
+        print(f'{self.table}')
         self.update_data()
         self.build_table()
 
     def refresh(self):
         os.system('cls' if os.name == 'nt' else 'clear')
-        print(f'{self}')
+        print(f'{self.table}')
         self.update_data()
         self.build_ui()
 
    
     def update_columns(self):
         self.ui_columns = []
-        for column_name, data in self.column_data.items():
+        for column in self.table.column_list:
             row = {
-                "name": column_name,
-                "label": data.label,
-                "field":column_name,
+                "name": column.name,
+                "label": column.label,
+                "field":column.name,
                 "align": "left",
-                "hide" : not data.selected
+                "hide" : not column.selected
             }
                 
-            if data.type in ['int', 'float', 'str', 'bool']:
+            if column.type in ['int', 'float', 'str', 'bool']:
                 row['filter'] = 'agTextColumnFilter'
                 row['resizable'] = True
                 row['autoSizeStrategy'] = {
                     "type" : "fitCellContents"
                 }
-            elif data.type == 'image':
+            elif column.type == 'image':
                 row['resizable'] = False
                 row['width'] = self.img_size[0]
 
 
-            if column_name == 'image_url':
+            if column.name == 'image_url':
                 row['lockPosition'] = 'left'
 
             self.ui_columns.append(row)
@@ -119,20 +119,20 @@ class Table_NGUI(Table):
     
     def update_rows(self):
         self.ui_rows = []
-        for i in range(len(self.row_data)):
-            if i in self.filtered_index:
+        for i in range(len(self.table.row_data)):
+            if i in self.table.filtered_index:
                 row = {}
-                for column_name, data in self.column_data.items():
-                    if data.selected:
-                        if data.type in ['int', 'float', 'bool', 'str']:
-                            row[column_name] = getattr(self.row_data[i], column_name)
-                        if (data.type == 'image'):
-                            img_url = getattr(self.row_data[i], column_name)
-                            row[column_name] = f'<img src="{img_url}" alt="Image" width="{self.img_size[0]}" height="{self.img_size[1]}">'
+                for column in self.table.column_list:
+                    if column.selected:
+                        if column.type in ['int', 'float', 'bool', 'str']:
+                            row[column.name] = getattr(self.table.row_data[i], column.name)
+                        if (column.type == 'image'):
+                            img_url = getattr(self.table.row_data[i], column.name)
+                            row[column.name] = f'<img src="{img_url}" alt="Image" width="{self.img_size[0]}" height="{self.img_size[1]}">'
                 self.ui_rows.append(row)
 
-    def toggle_column(self, column_data, visible):
-        column_data.selected = visible
-        self.ui_table.run_grid_method('setColumnsVisible', [column_data.name], visible)
+    def toggle_column(self, column, visible):
+        column.selected = visible
+        self.ui_table.run_grid_method('setColumnsVisible', [column.name], visible)
         #print(f'column data : {self.column_data}')
 

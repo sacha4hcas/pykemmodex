@@ -1,12 +1,11 @@
 from nicegui import ui
 
-class NColumn:
-    def __init__(self):
-        pass
+
 
 class GridTable:
-    def __init__(self):
+    def __init__(self, table):
         self.columns = {}
+        self.table = table
 
     def addColumn(self, column):
         self.columns.append()
@@ -15,5 +14,9 @@ class GridTable:
         for column, value in row.items():
             pass
 
-    def initFromTable(self, table):
-        self.columns = 0
+    def build_ui(self):
+
+        all_columns = ui.row().classes('gap-0')
+        with all_columns:
+            for column in self.table.column_list:
+                ui.label(column.label).classes('border p-1')

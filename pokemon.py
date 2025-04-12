@@ -6,12 +6,12 @@ class Pokemon:
                 setattr(self, key, value)
 
 
-    def table_print(self, column_data):
+    def table_print(self, column_list):
         _str = ""
-        for column, data in column_data.items():
-            if data.selected:
-                value = getattr(self, column)
-                padding = data.max_length - len(str(value))
+        for column in column_list:
+            if column.selected:
+                value = getattr(self, column.name)
+                padding = column.max_length - len(str(value))
                 _str += f'{value}{" " * padding} |'
         return _str
     
